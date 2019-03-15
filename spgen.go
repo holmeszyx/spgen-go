@@ -115,6 +115,7 @@ func parse(sp *toml.Tree) (*SpConfig, []*SpGroup, error) {
 	spConfig.KeyName = emptyDefault(spConfig.KeyName, "nm")
 	spConfig.KeyType = emptyDefault(spConfig.KeyType, "t")
 	spConfig.KeyComment = emptyDefault(spConfig.KeyComment, "cm")
+	spConfig.KeyDefaultValue = emptyDefault(spConfig.KeyDefaultValue, "v")
 
 	// get groups
 	allKey := sp.Keys()
@@ -158,21 +159,23 @@ func parse(sp *toml.Tree) (*SpConfig, []*SpGroup, error) {
 
 func parserItem(itemTree *toml.Tree, spConfig *SpConfig) *SpItem {
 	item := new(SpItem)
-	item.Name = itemTree.Get(spConfig.KeyName).(string)
-	typeName := itemTree.Get(spConfig.KeyType).(string)
+	item.Name = itemTree.GetDefault(spConfig.KeyName, "").(string)
+	typeName := itemTree.GetDefault(spConfig.KeyType, "").(string)
 	typeName = strings.ToLower(typeName)
 	item.Type = fromTypeName(typeName)
-	item.Comment = itemTree.Get(spConfig.KeyComment).(string)
+	item.Comment = itemTree.GetDefault(spConfig.KeyComment, "").(string)
+	item.DefaultValue = itemTree.GetDefault(spConfig.KeyDefaultValue, "").(string)
 	return item
 }
 
 type SpConfig struct {
-	Package    string `toml:"package,omitempty"`
-	ExportDir  string `toml:"dir,omitempty"`
-	Author     string `toml:"author,omitempty"`
-	KeyName    string `toml:"nameKey,omitempty"`
-	KeyType    string `toml:"typeKey,omitempty"`
-	KeyComment string `toml:"commentKey,omitempty"`
+	Package         string `toml:"package,omitempty"`
+	ExportDir       string `toml:"dir,omitempty"`
+	Author          string `toml:"author,omitempty"`
+	KeyName         string `toml:"nameKey,omitempty"`
+	KeyType         string `toml:"typeKey,omitempty"`
+	KeyComment      string `toml:"commentKey,omitempty"`
+	KeyDefaultValue string `toml:"defaultKey,omitempty"`
 }
 
 type SpGroup struct {
@@ -206,9 +209,10 @@ func fromTypeName(typeName string) ItemType {
 }
 
 type SpItem struct {
-	Name    string
-	Type    ItemType
-	Comment string
+	Name         string
+	Type         ItemType
+	DefaultValue string
+	Comment      string
 }
 
 func (s *SpItem) FuncName() string {

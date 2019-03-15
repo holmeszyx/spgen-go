@@ -9,6 +9,8 @@ type SpGenertor interface {
 	GenSp(spConfig *SpConfig, groups []*SpGroup)
 
 	MapTypeSymbol(itemType ItemType) string
+
+	ConvertValueString(itemType ItemType, v string) string
 }
 
 type GenEntity struct {
@@ -42,6 +44,11 @@ func (s *StdGenertor) itemString(item *SpItem) string {
 
 	builder.WriteRune('(')
 	builder.WriteString(item.Name)
+	v := s.ConvertValueString(item.Type, item.DefaultValue)
+	if v != "" {
+		builder.WriteRune(' ')
+		builder.WriteString(v)
+	}
 	builder.WriteRune(')')
 
 	builder.WriteRune(' ')
@@ -70,5 +77,14 @@ func (s *StdGenertor) MapTypeSymbol(itemType ItemType) string {
 		return "String"
 	default:
 		return "WTF"
+	}
+}
+
+func (s *StdGenertor) ConvertValueString(itemType ItemType, v string) string {
+	switch itemType {
+	case TypeString:
+		return "\"" + v + "\""
+	default:
+		return v
 	}
 }

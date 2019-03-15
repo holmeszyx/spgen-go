@@ -36,7 +36,7 @@ class {{.FileName}} {
 	 */
     var {{.FuncName}}: {{ typeSymbol .Type }}
         get() {
-            return mmkv.decode{{ typeSymbol .Type }}("{{ .Name }}")
+            return mmkv.decode{{ typeSymbol .Type }}("{{ .Name }}", {{ defValue .}})
         }
         set(value) {
             mmkv.encode("{{ .Name }}", value)
@@ -54,6 +54,9 @@ type KtGenerator struct {
 func (k *KtGenerator) BuildTemplate() *template.Template {
 	funcMap := template.FuncMap{
 		"typeSymbol": k.MapTypeSymbol,
+		"defValue": func(item *SpItem) string {
+			return k.ConvertValueString(item.Type, item.DefaultValue)
+		},
 	}
 	temp := template.New("kotlin").Funcs(funcMap)
 	t, err := temp.Parse(ktTemplate)
@@ -155,4 +158,67 @@ func (k *KtGenerator) MapTypeSymbol(itemType ItemType) string {
 	default:
 		return "Unit"
 	}
+}
+
+func (k *KtGenerator) ConvertValueString(itemType ItemType, v string) string {
+	switch itemType {
+	case TypeString:
+		return checkString(v)
+	case TypeInt:
+		return checkInt(v)
+	case TypeLong:
+		return checkLong(v)
+	case TypeFloat:
+		return checkFloat(v)
+	default:
+		return v
+	}
+}
+
+func checkInt(intStr string) string {
+	if intStr == "" {
+		return "0"
+	}
+	dot := strings.Index(intStr, ".")
+	if dot != -1 {
+		return intStr[:dot]
+	}
+	return intStr
+}
+
+func checkLong(v string) string {
+	dot := strings.Index(v, ".")
+	if dot != -1 {
+		v = v[:dot]
+	}
+	if v == "" {
+		return "0L"
+	}
+	suffix := v[len(v)-1]
+	if suffix != 'L' || suffix != 'l' {
+		return v + "L"
+	} else if suffix == 'l' {
+		return v[:len(v)-1] + "L"
+	}
+	return v
+}
+
+func checkFloat(v string) string {
+	if v == "" {
+		return "0F"
+	}
+	suffix := v[len(v)-1]
+	if suffix != 'F' || suffix != 'f' {
+		return v + "F"
+	} else if suffix == 'f' {
+		return v[:len(v)-1] + "F"
+	}
+	return v
+}
+
+func checkString(v string) string {
+	if v == "" {
+		return "\"\""
+	}
+	return "\"" + v + "\""
 }

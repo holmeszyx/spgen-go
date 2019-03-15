@@ -14,11 +14,12 @@ dir= "./exportDir"
 #nameKey="nm"
 #typeKey="t"
 #commentKey="cm"
+#defaultKey="v"
 
 # === The perference Group ===
 # === [[Group]] ===
 
-# === nm : name, cm: comment , t: type===
+# === nm : name, cm: comment , t: type, v: defaultValue ===
 
 [[Group1]]
     nm = "ItemName1"
@@ -33,7 +34,8 @@ dir= "./exportDir"
 [[Group2]]
     nm = "ItemName3"
     t = "float"
-    cm = "Comment3"	
+	cm = "Comment3"	
+	v = "3.14"
 `
 
 func createNewConfigTempalte(file string) error {
