@@ -1,0 +1,29 @@
+# "Config" 
+
+[Config]
+package="abc.e.f"
+dir= "./testdata"
+#author= "[Author name or empty]"
+#nameKey="nm"
+#typeKey="t"
+#commentKey="cm"
+
+# === The perference Group ===
+# === [[Group]] ===
+
+# === nm : name, cm: comment , t: type===
+
+[[Launch]]
+    nm = "display_count"
+    t = "int"
+    cm = "Launched count"
+
+[[Launch]]
+    nm = "launch_timestamp"
+    t = "long"
+    cm = "timestamp when launced"
+
+[[Prop]]
+    nm = "what_is_it_name"
+    t = "string"
+    cm = "Name"
