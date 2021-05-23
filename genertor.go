@@ -48,6 +48,12 @@ func (s *StdGenertor) itemString(item *SpItem) string {
 	builder.WriteString(s.MapTypeSymbol(item.Type))
 	builder.WriteRune(' ')
 
+	if item.DefaultValue != "" {
+		builder.WriteRune(' ')
+		builder.WriteString(fmt.Sprintf("(%s)", item.DefaultValue))
+		builder.WriteRune(' ')
+	}
+
 	builder.WriteString(" : ")
 	builder.WriteString(item.Comment)
 

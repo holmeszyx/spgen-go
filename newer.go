@@ -14,6 +14,7 @@ dir= "./exportDir"
 #nameKey="nm"
 #typeKey="t"
 #commentKey="cm"
+#defaultKey="def"
 
 # === The perference Group ===
 # === [[Group]] ===

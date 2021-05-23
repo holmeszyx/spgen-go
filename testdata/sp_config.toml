@@ -22,8 +22,15 @@ dir= "./testdata"
     nm = "launch_timestamp"
     t = "long"
     cm = "timestamp when launced"
+    def = "1"
 
 [[Prop]]
     nm = "what_is_it_name"
     t = "string"
     cm = "Name"
+    def = "a"
+
+[[Prop]]
+    nm = "empty:string"
+    t = "string"
+    cm = "Empty"

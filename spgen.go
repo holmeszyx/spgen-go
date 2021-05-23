@@ -11,6 +11,7 @@ import (
 
 const (
 	KEY_CONFIG = "Config"
+	VERSION    = "1.1.1"
 )
 
 // cli params
@@ -47,6 +48,14 @@ var cmd *cmder = &cmder{}
 func init() {
 	flag.StringVar(&(cmd.gener), "o", "std", "generator output plan. [std, android:kt]")
 	flag.BoolVar(&(cmd.genNewConfigToml), "new", false, "create a new config template to a explicit file. (default: config.toml)")
+
+	u := flag.Usage
+	flag.Usage = func() {
+		fmt.Println("Version:", VERSION)
+		fmt.Println("")
+
+		u()
+	}
 
 	flag.Parse()
 
@@ -115,6 +124,7 @@ func parse(sp *toml.Tree) (*SpConfig, []*SpGroup, error) {
 	spConfig.KeyName = emptyDefault(spConfig.KeyName, "nm")
 	spConfig.KeyType = emptyDefault(spConfig.KeyType, "t")
 	spConfig.KeyComment = emptyDefault(spConfig.KeyComment, "cm")
+	spConfig.KeyDefault = emptyDefault(spConfig.KeyDefault, "def")
 
 	// get groups
 	allKey := sp.Keys()
@@ -163,6 +173,9 @@ func parserItem(itemTree *toml.Tree, spConfig *SpConfig) *SpItem {
 	typeName = strings.ToLower(typeName)
 	item.Type = fromTypeName(typeName)
 	item.Comment = itemTree.Get(spConfig.KeyComment).(string)
+	if itemTree.Has(spConfig.KeyDefault) {
+		item.DefaultValue = itemTree.Get(spConfig.KeyDefault).(string)
+	}
 	return item
 }
 
@@ -173,6 +186,7 @@ type SpConfig struct {
 	KeyName    string `toml:"nameKey,omitempty"`
 	KeyType    string `toml:"typeKey,omitempty"`
 	KeyComment string `toml:"commentKey,omitempty"`
+	KeyDefault string `toml:"defaultKey,omitempty"`
 }
 
 type SpGroup struct {
@@ -206,9 +220,10 @@ func fromTypeName(typeName string) ItemType {
 }
 
 type SpItem struct {
-	Name    string
-	Type    ItemType
-	Comment string
+	Name         string
+	Type         ItemType
+	Comment      string
+	DefaultValue string
 }
 
 func (s *SpItem) FuncName() string {

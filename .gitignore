@@ -1,5 +1,6 @@
 spgen
 spgen.exe
+spgen.tar*
 
 /testdata/abc
 config.toml

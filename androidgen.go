@@ -17,15 +17,18 @@ import com.tencent.mmkv.MMKV
 
 /**
  * {{.Group.Name}}
- * Created by {{.Config.Author}} on {{.Date}}.
+ * Created by {{.Config.Author}} at {{.Date}}.
  */
 class {{.FileName}} {
 
     companion object {
+		@JvmStatic
         val instance: {{.FileName}} by lazy { {{.FileName}}() }
     }
 
-    private val mmkv: MMKV = MMKV.defaultMMKV()
+    private val mmkv: MMKV by lazy {
+        MMKV.mmkvWithID("__kvsp__", MMKV.MULTI_PROCESS_MODE)!!
+    }
 
     private constructor()
 
@@ -36,7 +39,7 @@ class {{.FileName}} {
 	 */
     var {{.FuncName}}: {{ typeSymbol .Type }}
         get() {
-            return mmkv.decode{{ typeSymbol .Type }}("{{ .Name }}")
+            return mmkv.decode{{ typeSymbol .Type }}("{{ .Name }}", {{ convertDef . }}){{ if eq .Type 4 }}!!{{ end }}
         }
         set(value) {
             mmkv.encode("{{ .Name }}", value)
@@ -54,6 +57,7 @@ type KtGenerator struct {
 func (k *KtGenerator) BuildTemplate() *template.Template {
 	funcMap := template.FuncMap{
 		"typeSymbol": k.MapTypeSymbol,
+		"convertDef": k.ConvertDef,
 	}
 	temp := template.New("kotlin").Funcs(funcMap)
 	t, err := temp.Parse(ktTemplate)
@@ -155,4 +159,33 @@ func (k *KtGenerator) MapTypeSymbol(itemType ItemType) string {
 	default:
 		return "Unit"
 	}
+}
+
+func (k *KtGenerator) takeNotEmpty(v string, d string) string {
+	v = strings.TrimSpace(v)
+	if v == "" {
+		return d
+	}
+	return v
+}
+
+func (k *KtGenerator) ConvertDef(item SpItem) string {
+	itemType := item.Type
+	dv := item.DefaultValue
+
+	switch itemType {
+	case TypeNone:
+		return ""
+	case TypeInt:
+		return k.takeNotEmpty(dv, "0")
+	case TypeFloat:
+		return k.takeNotEmpty(dv, "0") + "F"
+	case TypeLong:
+		return k.takeNotEmpty(dv, "0") + "L"
+	case TypeString:
+		return fmt.Sprintf("\"%s\"", k.takeNotEmpty(dv, ""))
+	default:
+		return ""
+	}
+
 }
