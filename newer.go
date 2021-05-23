@@ -20,6 +20,7 @@ dir= "./exportDir"
 # === [[Group]] ===
 
 # === nm : name, cm: comment , t: type===
+# === t: int, long, string, float, bool ===
 
 [[Group1]]
     nm = "ItemName1"

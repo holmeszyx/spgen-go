@@ -74,6 +74,8 @@ func (s *StdGenertor) MapTypeSymbol(itemType ItemType) string {
 		return "Long"
 	case TypeString:
 		return "String"
+	case TypeBool:
+		return "Boolean"
 	default:
 		return "WTF"
 	}

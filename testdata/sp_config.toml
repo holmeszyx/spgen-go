@@ -34,3 +34,26 @@ dir= "./testdata"
     nm = "empty:string"
     t = "string"
     cm = "Empty"
+
+[[Prop]]
+    nm = "c:bool"
+    t = "bool"
+    cm = "bool value"
+
+[[Prop]]
+    nm = "c:bool:d"
+    t = "bool"
+    cm = "default bool"
+    def = "false"
+
+[[Prop]]
+    nm = "c:bool:d2"
+    t = "bool"
+    cm = "default bool"
+    def = "asdfadf"
+
+[[Prop]]
+    nm = "c:bool:d3"
+    t = "bool"
+    cm = "default bool"
+    def = "132123"

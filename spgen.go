@@ -202,6 +202,7 @@ const (
 	TypeLong   = ItemType(iota)
 	TypeFloat  = ItemType(iota)
 	TypeString = ItemType(iota)
+	TypeBool   = ItemType(iota)
 )
 
 func fromTypeName(typeName string) ItemType {
@@ -214,6 +215,8 @@ func fromTypeName(typeName string) ItemType {
 		return TypeString
 	case "float":
 		return TypeFloat
+	case "bool":
+		return TypeBool
 	default:
 		return TypeNone
 	}

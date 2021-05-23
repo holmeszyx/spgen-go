@@ -39,10 +39,10 @@ class {{.FileName}} {
 	 */
     var {{.FuncName}}: {{ typeSymbol .Type }}
         get() {
-            return mmkv.decode{{ typeSymbol .Type }}("{{ .Name }}", {{ convertDef . }}){{ if eq .Type 4 }}!!{{ end }}
+            return mmkv.decode{{ actualTypeSymbol .Type }}("{{ .Name }}", {{ convertDef . }}){{ if eq .Type 4 }}!!{{ else if eq .Type 5}} != 0{{ end }}
         }
         set(value) {
-            mmkv.encode("{{ .Name }}", value)
+            mmkv.encode("{{ .Name }}", {{ if ne .Type 5 }}value {{- else }}if (value) 1 else 0{{end}})
 		}
 	{{end}}
 
@@ -56,8 +56,9 @@ type KtGenerator struct {
 
 func (k *KtGenerator) BuildTemplate() *template.Template {
 	funcMap := template.FuncMap{
-		"typeSymbol": k.MapTypeSymbol,
-		"convertDef": k.ConvertDef,
+		"typeSymbol":       k.MapTypeSymbol,
+		"actualTypeSymbol": k.ActualTypeSymbol,
+		"convertDef":       k.ConvertDef,
 	}
 	temp := template.New("kotlin").Funcs(funcMap)
 	t, err := temp.Parse(ktTemplate)
@@ -156,6 +157,28 @@ func (k *KtGenerator) MapTypeSymbol(itemType ItemType) string {
 		return "Long"
 	case TypeString:
 		return "String"
+	case TypeBool:
+		return "Boolean"
+	default:
+		return "Unit"
+	}
+}
+
+// acual used in backend
+func (k *KtGenerator) ActualTypeSymbol(itemType ItemType) string {
+	switch itemType {
+	case TypeNone:
+		return "Unit"
+	case TypeInt:
+		return "Int"
+	case TypeFloat:
+		return "Float"
+	case TypeLong:
+		return "Long"
+	case TypeString:
+		return "String"
+	case TypeBool:
+		return "Int"
 	default:
 		return "Unit"
 	}
@@ -184,6 +207,12 @@ func (k *KtGenerator) ConvertDef(item SpItem) string {
 		return k.takeNotEmpty(dv, "0") + "L"
 	case TypeString:
 		return fmt.Sprintf("\"%s\"", k.takeNotEmpty(dv, ""))
+	case TypeBool:
+		switch dv {
+		case "0", "", "false", "False":
+			return "0"
+		}
+		return "1"
 	default:
 		return ""
 	}
