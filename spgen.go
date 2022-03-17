@@ -11,7 +11,7 @@ import (
 
 const (
 	KEY_CONFIG = "Config"
-	VERSION    = "1.1.1"
+	VERSION    = "1.1.2"
 )
 
 // cli params
@@ -241,7 +241,8 @@ func toFuncName(name string) string {
 	var builder strings.Builder
 	upper := false
 	for _, c := range name {
-		if (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') {
+		// letter or number
+		if (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') {
 			if upper {
 				upper = false
 				if c >= 'a' && c <= 'z' {
